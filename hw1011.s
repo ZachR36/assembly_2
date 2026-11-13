@@ -3,8 +3,25 @@
     .globl sum_positive_ints
     .type sum_positive_ints, @function
 sum_positive_ints:
-    # TODO: Problem 1
     movq $0, %rax
+    cmpq $0, %rsi # No elements to sum
+    jle finished
+sum_loop:
+    # If nonnegative, add this one
+    cmpl $0, (%rdi)
+    jge add_case
+    jmp next_int
+add_case:
+    movl (%rdi), %r10d
+    addq %r10, %rax
+next_int:
+    addq $4, %rdi # Move array pointer to the next element
+    # Alter n, see if we should keep going
+    subq $1, %rsi
+    cmpq $0, %rsi
+    je finished
+    jmp sum_loop
+finished:
     ret
 
     .globl reverse_longs
