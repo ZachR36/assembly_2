@@ -53,8 +53,14 @@ finished_2:
     .globl sensor_score
     .type sensor_score, @function
 sensor_score:
-    # TODO: Problem 3
     movq $0, %rax
+    # Collect all three values
+    movslq (%rdi), %rsi # id
+    movq 8(%rdi), %rax # reading
+    movslq 16(%rdi), %rcx # weight
+    # Combine the values
+    imulq %rcx, %rax
+    addq %rsi, %rax
     ret
 
     .globl sensor_array_total
