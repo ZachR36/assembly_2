@@ -134,14 +134,33 @@ finished_5:
     .globl make_sensor
     .type make_sensor, @function
 make_sensor:
-    # TODO: Problem 6A
     movq $0, %rax
+    pushq %rdi
+    pushq %rsi
+    pushq %rdx
+    movq $24, %rdi
+    call malloc
+    popq %rdx
+    popq %rsi
+    popq %rdi
+    cmpq $0, %rax
+    je finished_make
+    # If we got memory, store the sensor here
+    movl %edi, (%rax)
+    movq %rsi, 8(%rax)
+    movl %edx, 16(%rax)
+finished_make:
     ret
 
     .globl sensor_destroy
     .type sensor_destroy, @function
 sensor_destroy:
-    # TODO: Problem 6B
+    cmpq $0, %rdi
+    je finished_destroy
+    subq $8, %rsp
+    call free
+    addq $8, %rsp
+finished_destroy:
     ret
 
     .section .note.GNU-stack,"",@progbits
