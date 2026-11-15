@@ -57,17 +57,40 @@ sensor_score:
     # Collect all three values
     movslq (%rdi), %rsi # id
     movq 8(%rdi), %rax # reading
-    movslq 16(%rdi), %rcx # weight
+    movslq 16(%rdi), %rdx # weight
     # Combine the values
-    imulq %rcx, %rax
+    imulq %rdx, %rax
     addq %rsi, %rax
     ret
 
     .globl sensor_array_total
     .type sensor_array_total, @function
 sensor_array_total:
-    # TODO: Problem 4
-    movq $0, %rax
+    movq $0, %rcx
+    cmpq $0, %rsi
+    jle finished_4 # Do nothing if the array is empty or NULL
+    # Make %r8 a pointer to check when we're done
+    movq $24, %rdx
+    imulq %rsi, %rdx
+    addq %rdi, %rdx
+add_sensor:
+    # Before calling sensor score, save the array pointer, the end pointer, and the sum
+    pushq %rdi
+    pushq %rdx
+    pushq %rcx
+    call sensor_score
+    # Add to the total score
+    popq %rcx
+    addq %rax, %rcx
+    # Get back and update the pointers
+    popq %rdx
+    popq %rdi
+    addq $24, %rdi
+    # Check if we're done
+    cmpq %rdi, %rdx
+    jg add_sensor
+finished_4:
+    movq %rcx, %rax
     ret
 
     .globl make_arithmetic_sequence
