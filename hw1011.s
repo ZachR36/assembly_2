@@ -96,9 +96,40 @@ finished_4:
     .globl make_arithmetic_sequence
     .type make_arithmetic_sequence, @function
 make_arithmetic_sequence:
-    # TODO: Problem 5
     movq $0, %rax
-    ret
+    cmpq $0, %rdx
+    jle finished_5
+    # Save the inputs, then call malloc
+    pushq %rdi
+    pushq %rsi
+    pushq %rdx
+    movq $8, %rdi
+    imulq %rdx, %rdi
+    call malloc
+    popq %rdx
+    popq %rsi
+    popq %rdi
+    cmpq $0, %rax
+    je no_space
+    # If we got space on heap, set up to fill the array
+    movq %rax, %rcx # Hold memory address on heap
+    jmp fill_array
+no_space:
+    movq $0, %rax
+    jmp finished_5
+fill_array:
+    movq %rdi, (%rcx)
+    # Check if we're done
+    subq $1, %rdx
+    cmpq $0, %rdx
+    je finished_5
+    # Set up for next iteration
+    addq $8, %rcx
+    addq %rsi, %rdi
+    jmp fill_array
+
+finished_5:
+    ret # Either zero or the starting point of the array
 
     .globl make_sensor
     .type make_sensor, @function
